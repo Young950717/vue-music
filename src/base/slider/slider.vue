@@ -49,12 +49,21 @@ export default {
         this._play()
       }
     }, 20)
+    window.addEventListener('resize',this._resize)
+    this.$once('hook:destroyed',()=>{
+      window.removeEventListener('resize',this._resize)
+    })
   },
   methods: {
+    _resize(){
+      if(!this.slider) return
+      this._setSliderWidth(true)
+      this.slider.refresh()
+    },
     _initDots () {
       this.docts = new Array(this.children.length)
     },
-    _setSliderWidth () {
+    _setSliderWidth (isResize) {
       this.children = this.$refs.sliderGroup.children // 轮播图数组
       let width = 0
       let sliderWidth = this.$refs.slider.clientWidth // 父容器
@@ -64,28 +73,28 @@ export default {
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
-      if (this.loop) { // 如果循环的话bscroll需要两倍的宽度
+      if (this.loop && !isResize) { // 如果循环的话bscroll需要两倍的宽度
         width += 2 * sliderWidth
       }
       this.$refs.sliderGroup.style.width = width + 'px'
     },
     _initSlider () {
       this.slider = new BScroll(this.$refs.slider, {
-        scrollX: true,
-        scrollY: false,
-        momentum: false,
-        snap: {
-          loop: this.loop,
-          threshold: 0.3,
-          speed: 400
-        }
-        // scrollY: false,
         // scrollX: true,
+        // scrollY: false,
         // momentum: false,
-        // snap: true,
-        // snapLoop: this.loop,
-        // snapThreshold: 0.3,
-        // snapSpeed: 400,
+        // snap: {
+        //   loop: this.loop,
+        //   threshold: 0.3,
+        //   speed: 400
+        // }
+        scrollY: false,
+        scrollX: true,
+        momentum: false,
+        snap: true,
+        snapLoop: this.loop,
+        snapThreshold: 0.3,
+        snapSpeed: 400
         // click: true
       })
       this.slider.on('scrollEnd', () => {
