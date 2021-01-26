@@ -51,6 +51,7 @@ export default {
     }, 20)
     window.addEventListener('resize', this._resize)
     this.$once('hook:destroyed', () => {
+      clearTimeout(this.timer)
       window.removeEventListener('resize', this._resize)
     })
   },

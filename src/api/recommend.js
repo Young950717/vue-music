@@ -39,3 +39,22 @@ export function getRecommend () {
     return res.data
   })
 }
+export function getDiscList () {
+  const url = '/api/getDiscList'
+  const data = Object.assign({}, commonParams, {
+    platform: 'yqq',
+    hostUin: 0,
+    sin: 0,
+    ein: 0,
+    sortId: 5,
+    needNewCode: 0,
+    categoryId: 10000000,
+    rnd: Math.random(),
+    format: 'json'
+  })
+  return axios.get(url, {
+    params: data
+  }).then(res => {
+    return res.data
+  })
+}

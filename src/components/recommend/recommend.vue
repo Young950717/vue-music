@@ -16,14 +16,30 @@
       </div>
       <div class="recommend-list">
         <h1 class="list-title">热门歌曲推荐</h1>
-        <ul></ul>
+        <ul>
+          <li class="item"
+              v-for="item in discList"
+              :key="item.dissid">
+            <div class="icon">
+              <img width="60"
+                   height="60"
+                   :src="item.imgurl">
+            </div>
+            <div class="text">
+              <h2 class="name"
+                  v-html="item.creator.name"></h2>
+              <span class="desc"
+                    v-html="item.dissname"></span>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getRecommend } from 'api/recommend'
+import { getRecommend, getDiscList } from 'api/recommend'
 import { ERR_OK } from 'api/config'
 import Slider from 'base/slider/slider'
 export default {
@@ -32,18 +48,29 @@ export default {
   },
   created () {
     this._getRecommend()
+    this._getDiscList()
   },
   data () {
     return {
-      recommends: []
+      recommends: [],
+      discList: []
     }
   },
   methods: {
     _getRecommend () {
-
       getRecommend().then(res => {
         if (res.code === ERR_OK) {
           this.recommends = res.data.slider
+        }
+      })
+    },
+    _getDiscList () {
+      getDiscList().then(res => {
+        if (res.code === ERR_OK) {
+          for (let i = 0; i < 10; i++) {
+            this.discList.push(res.data.list[0])
+          }
+          // this.discList = res.data.list
         }
       })
     }
