@@ -8,7 +8,7 @@
     </div>
     <div class="dots">
       <span class="dot"
-            v-for="(item,idx) in docts"
+            v-for="(item, idx) in docts"
             :class="{ active:currentPageIndex === idx }"
             :key="idx"></span>
     </div>
@@ -49,14 +49,14 @@ export default {
         this._play()
       }
     }, 20)
-    window.addEventListener('resize',this._resize)
-    this.$once('hook:destroyed',()=>{
-      window.removeEventListener('resize',this._resize)
+    window.addEventListener('resize', this._resize)
+    this.$once('hook:destroyed', () => {
+      window.removeEventListener('resize', this._resize)
     })
   },
   methods: {
-    _resize(){
-      if(!this.slider) return
+    _resize () {
+      if (!this.slider) return
       this._setSliderWidth(true)
       this.slider.refresh()
     },
@@ -88,33 +88,25 @@ export default {
         //   threshold: 0.3,
         //   speed: 400
         // }
-        scrollY: false,
-        scrollX: true,
-        momentum: false,
-        snap: true,
-        snapLoop: this.loop,
-        snapThreshold: 0.3,
-        snapSpeed: 400
+        // scrollY: false,
+        // scrollX: true,
+        // momentum: false,
+        // snap: true,
+        // snapLoop: this.loop,
+        // snapThreshold: 0.3,
+        // snapSpeed: 400
         // click: true
+        click: true,
+        scrollX: true,
+        scrollY: false,
+        momentum: false,
+        bounce: false,
+        probeType: 2,
+        slide: true
       })
-      this.slider.on('scrollEnd', () => {
-        let pageIndex = this.slider.getCurrentPage().pageX
-        if (this.loop) {
-          pageIndex -= 1
-        }
-        this.currentPageIndex = pageIndex
+      this.slider.on('slideWillChange', (page) => {
+        this.currentPageIndex = page.pageX
       })
-      // this.slider.on('scrollEnd', this._onScrollEnd)
-      // this.slider.on('touchend', () => {
-      //   if (this.autoPlay) {
-      //     this._play()
-      //   }
-      // })
-      // this.slider.on('beforeScrollStart', () => {
-      //   if (this.autoPlay) {
-      //     clearTimeout(this.timer)
-      //   }
-      // })
     },
     _play () {
       let pageIndex = this.currentPageIndex + 1
@@ -141,10 +133,9 @@ export default {
     white-space: nowrap;
 
     .slider-item {
-      float: left;
-      box-sizing: border-box;
-      overflow: hidden;
-      text-align: center;
+      display: inline-block;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
 
       a {
         display: block;

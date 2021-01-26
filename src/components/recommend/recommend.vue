@@ -3,13 +3,16 @@
     <div class="recommend-content">
       <div v-if="recommends.length"
            class="slider-wrapper">
-        <slider>
-          <div v-for="item in recommends"
-               :key="item.id">
-            <a :href="item.linkUrl"></a>
-            <img :src="item.picUrl">
-          </div>
-        </slider>
+        <div class="slider-content">
+          <slider>
+            <div v-for="item in recommends"
+                 :key="item.id"
+                 class="slider-item">
+              <a :href="item.linkUrl"></a>
+              <img :src="item.picUrl">
+            </div>
+          </slider>
+        </div>
       </div>
       <div class="recommend-list">
         <h1 class="list-title">热门歌曲推荐</h1>
