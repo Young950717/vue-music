@@ -4,9 +4,15 @@ import router from './router'
 import store from './store'
 import 'babel-polyfill'
 import fastclick from 'fastclick'
+import VueLazeLoad from 'vue-lazyload'
 
 Vue.config.productionTip = false
+
+Vue.use(VueLazeLoad, {
+  loading: require('common/image/default.png')
+})
 fastclick.attach(document.body)
+
 import 'common/stylus/index.styl'
 new Vue({
   router,
