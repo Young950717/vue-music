@@ -97,7 +97,7 @@ export default {
         // snapThreshold: 0.3,
         // snapSpeed: 400
         // click: true
-        click: true,
+        click: false,
         scrollX: true,
         scrollY: false,
         momentum: false,

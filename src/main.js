@@ -4,11 +4,11 @@ import router from './router'
 import store from './store'
 import 'babel-polyfill'
 import fastclick from 'fastclick'
-import VueLazeLoad from 'vue-lazyload'
+import VueLazyload from 'vue-lazyload'
 
 Vue.config.productionTip = false
 
-Vue.use(VueLazeLoad, {
+Vue.use(VueLazyload, {
   loading: require('common/image/default.png')
 })
 fastclick.attach(document.body)
