@@ -1,7 +1,10 @@
 <template>
   <scroll class="listview"
           ref="listview"
-          :data="data">
+          :data="data"
+          :listenScroll="listenScroll"
+          @scroll="scroll"
+          :probeType="probeType">
     <ul>
       <li v-for="group in data"
           ref="listGroup"
@@ -26,24 +29,47 @@
         <li v-for="(item, idx) in shortcutList"
             :data-index="idx"
             :key="idx"
-            class="item">
+            class="item"
+            :class="{ current: currentIndex === idx }">
           {{ item }}
         </li>
       </ul>
+    </div>
+    <div class="list-fixed"
+         ref="fixed"
+         v-show="fixedTitle">
+      <h1 class="fixed-title">{{ fixedTitle }}</h1>
+    </div>
+    <div v-show="!data.length"
+         class="loading-container">
+      <loading />
     </div>
   </scroll>
 </template>
 <script>
 import Scroll from '../scroll/scroll'
 import { getData } from 'common/js/dom'
+import Loading from 'base/loading/loading'
 const ANCHOR_HEIGHT = 18 // 每个锚点的高度
+const TITLE_HEIGHT = 30 // 固定标题的高度
 export default {
   name: 'list-view',
   created () {
     this.touch = {}
+    this.listenScroll = true
+    this.listHeight = []
+    this.probeType = 3
+  },
+  data () {
+    return {
+      scrollY: -1,
+      currentIndex: 0,
+      diff: -1
+    }
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   props: {
     data: {
@@ -53,11 +79,58 @@ export default {
       }
     }
   },
+  watch: {
+    data: {
+      handler () {
+        setTimeout(() => {
+          this._calculateHeight()
+        }, 20)
+      }
+    },
+    scrollY: {
+      handler (newY) {
+        const listHeight = this.listHeight
+        // 滚动到顶部 newY > 0
+        if (newY > 0) {
+          this.currentIndex = 0
+          return
+        }
+        // 在中间滚动
+        for (let i = 0; i < listHeight.length - 1; i++) {
+          let height1 = listHeight[i] // 上限
+          let height2 = listHeight[i + 1] // 下限
+          // newY是负的
+          if (-newY >= height1 && -newY < height2) {
+            this.currentIndex = i
+            this.diff = height2 + newY
+            return
+          }
+        }
+
+        // 滚动到底部 且-newY > 最后一个元素的上限
+        this.currentIndex = this.listHeight.length - 2
+      }
+    },
+    diff: {
+      handler (newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
+      }
+    }
+  },
   computed: {
     shortcutList () {
       return this.data.map(item => {
         return item.title.substr(0, 1)
       })
+    },
+    fixedTitle () {
+      if (this.scrollY > 0) return
+      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
     }
   },
   methods: {
@@ -75,8 +148,29 @@ export default {
       let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
       this._scrollTo(anchorIndex)
     },
+    scroll (position) {
+      this.scrollY = position.y
+    },
     _scrollTo (index) {
+      if (!index && index !== 0) return
+      if (index < 0) {
+        index = 0
+      } else if (index > this.listHeight.length - 2) {
+        index = this.listHeight.length - 2
+      }
+      this.scrollY = -this.listHeight[index]
       this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0) // 参数0的意义是滚动的事件
+    },
+    _calculateHeight () {
+      this.listHeight = []
+      const list = this.$refs.listGroup
+      let height = 0
+      this.listHeight.push(height)
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
     }
   }
 }
