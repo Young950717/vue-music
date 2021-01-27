@@ -23,8 +23,8 @@
           <h1 class="list-title">热门歌曲推荐</h1>
           <ul>
             <li class="item"
-                v-for="item in discList"
-                :key="item.dissid">
+                v-for="(item, idx) in discList"
+                :key="idx">
               <div class="icon">
                 <img width="60"
                      height="60"

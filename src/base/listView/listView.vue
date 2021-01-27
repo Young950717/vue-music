@@ -1,8 +1,10 @@
 <template>
   <scroll class="listview"
+          ref="listview"
           :data="data">
     <ul>
       <li v-for="group in data"
+          ref="listGroup"
           :key="group.title"
           class="list-group">
         <h2 class="list-group-title">{{ group.title }}</h2>
@@ -17,9 +19,12 @@
         </ul>
       </li>
     </ul>
-    <div class="list-shortcut">
+    <div class="list-shortcut"
+         @touchstart="onShortcutTouchStart"
+         @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <li v-for="(item, idx) in shortcutList"
+            :data-index="idx"
             :key="idx"
             class="item">
           {{ item }}
@@ -30,8 +35,13 @@
 </template>
 <script>
 import Scroll from '../scroll/scroll'
+import { getData } from 'common/js/dom'
+const ANCHOR_HEIGHT = 18 // 每个锚点的高度
 export default {
   name: 'list-view',
+  created () {
+    this.touch = {}
+  },
   components: {
     Scroll
   },
@@ -48,6 +58,25 @@ export default {
       return this.data.map(item => {
         return item.title.substr(0, 1)
       })
+    }
+  },
+  methods: {
+    onShortcutTouchStart (e) {
+      let anchorIndex = getData(e.target, 'index')
+      let firstTouch = e.touches[0]
+      this.touch.y1 = firstTouch.pageY
+      this.touch.anchorIndex = anchorIndex
+      this._scrollTo(anchorIndex)
+    },
+    onShortcutTouchMove (e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      let dalta = Math.floor((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT)
+      let anchorIndex = parseInt(this.touch.anchorIndex) + dalta
+      this._scrollTo(anchorIndex)
+    },
+    _scrollTo (index) {
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0) // 参数0的意义是滚动的事件
     }
   }
 }

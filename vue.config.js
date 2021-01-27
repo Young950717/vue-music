@@ -5,7 +5,7 @@ const axios = require('axios')
 function resolve (dir) {
   return path.join(__dirname, dir)
 }
-
+console.log('process.env.NODE_ENV===========' + process.env.NODE_ENV)
 module.exports = {
   devServer: {
     before (app) {
