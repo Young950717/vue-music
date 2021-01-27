@@ -14,7 +14,8 @@
         <ul>
           <li v-for="item in group.items"
               :key="item.id"
-              class="list-group-item">
+              class="list-group-item"
+              @click="selectItem(item)">
             <img v-lazy="item.avatar"
                  class="avatar" />
             <span class="name">{{ item.name }}</span>
@@ -150,6 +151,9 @@ export default {
     },
     scroll (position) {
       this.scrollY = position.y
+    },
+    selectItem (item) {
+      this.$emit('select', item)
     },
     _scrollTo (index) {
       if (!index && index !== 0) return
