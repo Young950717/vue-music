@@ -1,13 +1,14 @@
 <template>
   <transition appear
               name="slide">
-    <div class="singer-detail">
-
-    </div>
+    <music-list :songs="songs"
+                :title="title"
+                :bgImage="bgImage"></music-list>
   </transition>
 </template>
 
 <script>
+import MusicList from 'components/music-list/music-list'
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
 import { ERR_OK } from 'api/config'
@@ -21,8 +22,17 @@ export default {
       songs: []
     }
   },
+  components: {
+    MusicList
+  },
   computed: {
-    ...mapGetters(['singer'])
+    ...mapGetters(['singer']),
+    title () {
+      return this.singer.name
+    },
+    bgImage () {
+      return this.singer.avatar
+    }
   },
   methods: {
     _getDetail () {
@@ -32,10 +42,10 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code === ERR_OK) {
-          // this.songs = this._normalizeSongs(res.data.list)
-          processSongsUrl(this._normalizeSongs(res.data.list)).then(songs => {
-            this.songs = songs
-          })
+          this.songs = this._normalizeSongs(res.data.list)
+          // processSongsUrl(this._normalizeSongs(res.data.list)).then(songs => {
+          //   this.songs = songs
+          // })
         }
       })
     },
@@ -55,16 +65,6 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~common/stylus/variable';
-
-.singer-detail {
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-color: $color-background;
-}
 
 .slide-enter-active, .slide-leave-active {
   transition: all 0.3s;
