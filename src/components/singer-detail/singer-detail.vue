@@ -42,14 +42,15 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code === ERR_OK) {
-          this.songs = this._normalizeSongs(res.data.list)
-          // processSongsUrl(this._normalizeSongs(res.data.list)).then(songs => {
-          //   this.songs = songs
-          // })
+          // this.songs = this._normalizeSongs(res.data.list)
+          processSongsUrl(this._normalizeSongs(res.data.list)).then(songs => {
+            this.songs = songs
+          })
         }
       })
     },
     _normalizeSongs (list) {
+      console.log(list);
       let ret = []
       list.forEach(item => {
         let { musicData } = item

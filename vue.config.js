@@ -72,12 +72,13 @@ module.exports = {
       })
 
       app.post('/api/getPurlUrl', bodyParser.json(), function (req, res) {
-        const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg'
+        const url = 'https://u.y.qq.com/cgi-bin/musics.fcg'
         axios.post(url, req.body, {
           headers: {
             referer: 'https://y.qq.com/',
             origin: 'https://y.qq.com',
-            'Content-type': 'application/x-www-form-urlencoded'
+            'Content-type': 'application/x-www-form-urlencoded',
+            'accept': 'application/json, text/javascript, */*; q=0.01'
           }
         }).then((response) => {
           res.json(response.data)

@@ -78,6 +78,8 @@
         </div>
       </div>
     </transition>
+    <audio ref="audio"
+           :src="currentSong.url"></audio>
   </div>
 </template>
 
@@ -93,6 +95,15 @@ export default {
       'playList',
       'currentSong'
     ])
+  },
+  watch: {
+    currentSong: {
+      handler () {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+      }
+    }
   },
   methods: {
     ...mapMutations({
