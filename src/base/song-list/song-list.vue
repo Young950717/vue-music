@@ -4,7 +4,7 @@
       <li v-for="(song,idx) in songs"
           :key="idx"
           class="item"
-          @touchend="selectItem(song,idx)">
+          @click="selectItem(song,idx)">
         <div class="content">
           <h2 class="name">{{ song.name }}</h2>
           <p class="desc">{{ getDesc(song) }}</p>

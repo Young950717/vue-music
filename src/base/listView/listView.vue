@@ -15,7 +15,7 @@
           <li v-for="item in group.items"
               :key="item.id"
               class="list-group-item"
-              @touchend="selectItem(item)">
+              @click="selectItem(item)">
             <img v-lazy="item.avatar"
                  class="avatar" />
             <span class="name">{{ item.name }}</span>
