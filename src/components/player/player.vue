@@ -44,7 +44,8 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i @click="togglePlaying"
+                 class="icon-play"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -93,7 +94,8 @@ export default {
     ...mapGetters([
       'fullScreen',
       'playList',
-      'currentSong'
+      'currentSong',
+      'playing'
     ])
   },
   watch: {
@@ -103,11 +105,18 @@ export default {
           this.$refs.audio.play()
         })
       }
+    },
+    playing: {
+      handler (newPlaying) {
+        const audio = this.$refs.audio
+        newPlaying ? audio.play() : audio.pause()
+      }
     }
   },
   methods: {
     ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE'
     }),
     back () {
       this.setFullScreen(false)
@@ -156,6 +165,9 @@ export default {
     afterLeave () {
       this.$refs.cdWrapper.transition = ''
       this.$refs.cdWrapper.style[transform] = ''
+    },
+    togglePlaying () {
+      this.setPlayingState(!this.playing)
     },
     _getPosScale () {
       const targetWidth = 40,

@@ -1,4 +1,7 @@
-import { getSongsUrl } from 'api/song'
+import { getLyric, getSongsUrl } from 'api/song'
+import { ERR_OK } from 'api/config'
+import { Base64 } from 'js-base64'
+
 export default class Song {
   constructor({ id, mid, singer, name, album, duration, image, url }) {
     this.id = id
@@ -8,14 +11,32 @@ export default class Song {
     this.album = album
     this.duration = duration
     this.image = image
-    this.url = url
     this.filename = `C400${this.mid}.m4a`
+    this.url = url
+  }
+
+  getLyric () {
+    if (this.lyric) {
+      return Promise.resolve(this.lyric)
+    }
+
+    return new Promise((resolve, reject) => {
+      getLyric(this.mid).then((res) => {
+        if (res.retcode === ERR_OK) {
+          this.lyric = Base64.decode(res.lyric)
+          resolve(this.lyric)
+        } else {
+          reject(new Error('no lyric'))
+        }
+      })
+    })
   }
 }
+
 export function createSong (musicData) {
   return new Song({
-    id: musicData.id,
-    mid: musicData.mid,
+    id: musicData.songid,
+    mid: musicData.songmid,
     singer: filterSinger(musicData.singer),
     name: musicData.songname,
     album: musicData.albumname,
@@ -24,17 +45,22 @@ export function createSong (musicData) {
     url: musicData.url
   })
 }
-export function filterSinger (singerArr) {
+
+function filterSinger (singer) {
   let ret = []
-  if (!singerArr) return
-  singerArr.forEach(item => {
-    ret.push(item.name)
+  if (!singer) {
+    return ''
+  }
+  singer.forEach((s) => {
+    ret.push(s.name)
   })
   return ret.join('/')
 }
+
 export function isValidMusic (musicData) {
   return musicData.songid && musicData.albummid && (!musicData.pay || musicData.pay.payalbumprice === 0)
 }
+
 export function processSongsUrl (songs) {
   if (!songs.length) {
     return Promise.resolve(songs)

@@ -3,8 +3,31 @@ import { getUid } from 'common/js/uid'
 import axios from 'axios'
 import { ERR_OK } from 'api/config'
 
+const debug = process.env.NODE_ENV !== 'production'
+
+export function getLyric (mid) {
+  const url = debug ? '/api/lyric' : 'http://ustbhuangyi.com/music/api/lyric'
+
+  const data = Object.assign({}, commonParams, {
+    songmid: mid,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0,
+    categoryId: 10000000,
+    pcachetime: +new Date(),
+    format: 'json'
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
+}
+
 export function getSongsUrl (songs) {
-  const url = '/api/getPurlUrl'
+  const url = debug ? '/api/getPurlUrl' : 'http://ustbhuangyi.com/music/api/getPurlUrl'
+
   let mids = []
   let types = []
 
@@ -66,6 +89,7 @@ export function getSongsUrl (songs) {
     request()
   })
 }
+
 function genUrlMid (mids, types) {
   const guid = getUid()
   return {

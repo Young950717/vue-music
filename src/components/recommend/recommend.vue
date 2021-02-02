@@ -1,5 +1,6 @@
 <template>
-  <div class="recommend">
+  <div class="recommend"
+       ref="recommend">
     <scroll ref="scroll"
             class="recommend-content"
             :data="discList">
@@ -7,34 +8,34 @@
         <div v-if="recommends.length"
              class="slider-wrapper">
           <div class="slider-content">
-            <slider>
-              <div v-for="item in recommends"
-                   :key="item.id"
-                   class="slider-item">
-                <a :href="item.linkUrl"></a>
-                <img class="needsclick"
-                     @load="imgLoad"
-                     v-lazy="item.picUrl">
+            <slider ref="slider">
+              <div v-for="(item,index) in recommends"
+                   :key="index">
+                <a :href="item.linkUrl">
+                  <img @load="loadImage"
+                       :src="item.picUrl">
+                </a>
               </div>
             </slider>
           </div>
         </div>
         <div class="recommend-list">
-          <h1 class="list-title">热门歌曲推荐</h1>
+          <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li class="item"
-                v-for="(item, idx) in discList"
-                :key="idx">
+            <li @click="selectItem(item)"
+                v-for="(item,index) in discList"
+                class="item"
+                :key="index">
               <div class="icon">
                 <img width="60"
                      height="60"
-                     :src="item.imgurl">
+                     v-lazy="item.imgurl">
               </div>
               <div class="text">
                 <h2 class="name"
                     v-html="item.creator.name"></h2>
-                <span class="desc"
-                      v-html="item.dissname"></span>
+                <p class="desc"
+                   v-html="item.dissname"></p>
               </div>
             </li>
           </ul>
@@ -45,6 +46,7 @@
         <loading></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -81,11 +83,11 @@ export default {
     _getDiscList () {
       getDiscList().then(res => {
         if (res.code === ERR_OK) {
-          // 没那么多数据，造重复的人为制造一点高度
-          for (let i = 0; i < 10; i++) {
-            this.discList.push(res.data.list[0])
-          }
-          // this.discList = res.data.list
+          // // 没那么多数据，造重复的人为制造一点高度
+          // for (let i = 0; i < 10; i++) {
+          //   this.discList.push(res.data.list[0])
+          // }
+          this.discList = res.data.list
         }
       })
     },
