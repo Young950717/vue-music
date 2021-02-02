@@ -12,7 +12,7 @@
               <div v-for="(item,index) in recommends"
                    :key="index">
                 <a :href="item.linkUrl">
-                  <img @load="loadImage"
+                  <img @load="imgLoad"
                        :src="item.picUrl">
                 </a>
               </div>
