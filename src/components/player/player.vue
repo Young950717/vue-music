@@ -38,14 +38,17 @@
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
-            <span class="time time-l"></span>
+            <span class="time time-l">{{ format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent"
+                            @percentChange="onProgressChange"></progress-bar>
             </div>
-            <span class="time time-r"></span>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left"
+                 @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left">
               <i @click="prev"
@@ -87,8 +90,12 @@
              v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying"
-             :class="miniIcon"></i>
+          <progressCircle :radius="32"
+                          :percent="percent">
+            <i @click.stop="togglePlaying"
+               class="icon-mini"
+               :class="miniIcon"></i>
+          </progressCircle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -98,7 +105,9 @@
     <audio ref="audio"
            :src="currentSong.url"
            @canplay="ready"
-           @error="error"></audio>
+           @error="error"
+           @timeupdate="updateTime"
+           @ended="end"></audio>
   </div>
 </template>
 
@@ -106,15 +115,30 @@
 import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
+import progressBar from 'base/progress-bar/progress-bar'
+import progressCircle from 'base/progress-circle/progress-circle'
+import { playMode } from 'common/js/config'
+import { shuffle } from 'common/js/utils'
 const transform = prefixStyle('transform')
 export default {
   name: 'player',
   data () {
     return {
-      songReady: false
+      songReady: false,
+      currentTime: 0
     }
   },
+  components: {
+    progressBar,
+    progressCircle
+  },
   computed: {
+    iconMode () {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+    },
+    percent () {
+      return this.currentTime / this.currentSong.duration
+    },
     playIcon () {
       return this.playing ? 'icon-pause' : 'icon-play'
     },
@@ -132,12 +156,15 @@ export default {
       'playList',
       'currentSong',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode',
+      'sequenceList'
     ])
   },
   watch: {
     currentSong: {
-      handler () {
+      handler (newSong, oldSong) {
+        if (newSong.id === oldSong.id) return
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
@@ -156,8 +183,13 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     }),
+    updateTime (e) {
+      this.currentTime = e.target.currentTime
+    },
     back () {
       this.setFullScreen(false)
     },
@@ -212,25 +244,33 @@ export default {
     },
     prev () {
       if (!this.songReady) return
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playList.length - 1
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playList.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
       this.songReady = true
     },
     next () {
       if (!this.songReady) return
-      let index = this.currentIndex + 1
-      if (index === this.playList.length) {
-        index = 0
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playList.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
       this.songReady = true
     },
@@ -239,6 +279,55 @@ export default {
     },
     error () {
       this.songReady = true
+    },
+    end () {
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.next()
+      }
+    },
+    loop () {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
+    },
+    format (interval) {
+      interval = interval | 0  // 向下取整
+      const minute = interval / 60 | 0
+      const second = this._pad(interval % 60)
+      return `${minute}:${second}`
+    },
+    onProgressChange (percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    },
+    changeMode () {
+      const mode = (this.mode + 1) % 3
+      // debugger
+      this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)
+    },
+    resetCurrentIndex (list) {
+      let index = list.findIndex(item => item.id === this.currentSong.id)
+      this.setCurrentIndex(index)
+    },
+    // 补位
+    _pad (num, n = 2) {
+      let len = num.toString().length
+      while (len < n) {
+        num = '0' + num
+        len++
+      }
+      return num
     },
     _getPosScale () {
       const targetWidth = 40,

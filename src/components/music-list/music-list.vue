@@ -12,7 +12,8 @@
       <div class="play-wrapper">
         <div class="play"
              ref="playButton"
-             v-show="songs.length > 0">
+             v-show="songs.length > 0"
+             @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -127,7 +128,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['selectPlay']),
+    ...mapActions(['selectPlay', 'randomPlay']),
     scroll (position) {
       this.scrollY = position.y
     },
@@ -138,6 +139,11 @@ export default {
       this.selectPlay({
         list: this.songs,
         index
+      })
+    },
+    random () {
+      this.randomPlay({
+        list: this.songs
       })
     }
   }

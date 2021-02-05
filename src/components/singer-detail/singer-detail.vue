@@ -50,7 +50,6 @@ export default {
       })
     },
     _normalizeSongs (list) {
-      console.log(list);
       let ret = []
       list.forEach(item => {
         let { musicData } = item
