@@ -49,6 +49,7 @@ import Scroll from 'base/scroll/scroll'
 import SongList from 'base/song-list/song-list'
 import { prefixStyle } from 'common/js/dom'
 import Loading from 'base/loading/loading.vue'
+import { playListMinxi } from 'common/js/mixin'
 import { mapActions } from 'vuex'
 const transform = prefixStyle('transform')
 const backDrop = prefixStyle('backdrop-filter')
@@ -71,6 +72,7 @@ export default {
       default: ''
     }
   },
+  mixins: [playListMinxi],
   components: {
     Scroll,
     SongList,
@@ -129,6 +131,11 @@ export default {
   },
   methods: {
     ...mapActions(['selectPlay', 'randomPlay']),
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
     scroll (position) {
       this.scrollY = position.y
     },

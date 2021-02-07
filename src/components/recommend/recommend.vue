@@ -56,12 +56,14 @@ import { ERR_OK } from 'api/config'
 import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
+import { playListMinxi } from 'common/js/mixin'
 export default {
   components: {
     Slider,
     Scroll,
     Loading
   },
+  mixins: [playListMinxi],
   created () {
     this._getRecommend()
     this._getDiscList()
@@ -73,6 +75,11 @@ export default {
     }
   },
   methods: {
+    handlePlayList (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     _getRecommend () {
       getRecommend().then(res => {
         if (res.code === ERR_OK) {
@@ -97,6 +104,8 @@ export default {
         this.$refs.scroll.refresh()
         this.checkLoaded = true
       }
+    },
+    selectItem () {
 
     }
   }
