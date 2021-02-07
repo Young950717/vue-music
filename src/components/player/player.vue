@@ -76,15 +76,18 @@
                  @click="changeMode">
               <i :class="iconMode"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left"
+                 :class="disableCls">
               <i @click="prev"
                  class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center"
+                 :class="disableCls">
               <i @click="togglePlaying"
                  :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right"
+                 :class="disableCls">
               <i @click="next"
                  class="icon-next"></i>
             </div>
@@ -130,7 +133,7 @@
     </transition>
     <audio ref="audio"
            :src="currentSong.url"
-           @canplay="ready"
+           @playing="ready"
            @error="error"
            @timeupdate="updateTime"
            @ended="end"></audio>
@@ -161,7 +164,9 @@ export default {
       currentLyric: null,
       currentLineNum: 0,
       currentShow: 'cd',
-      playingLyric: ''
+      playingLyric: '',
+      isPureMusic: false,// 纯音乐
+      pureMusicLyric: ''
     }
   },
   components: {
@@ -202,9 +207,6 @@ export default {
     currentSong: {
       handler (newSong, oldSong) {
         if (!newSong.id || !newSong.url || newSong.id === oldSong.id) return
-        if (this.currentLyric) {
-          this.currentLyric.stop()
-        }
         this.songReady = false
         this.canLyricPlay = false
         if (this.currentLyric) {
@@ -215,8 +217,10 @@ export default {
           this.playingLyric = ''
           this.currentLineNum = 0
         }
-        this.$refs.audio.src = newSong.url
-        this.$refs.audio.play()
+        this.$nextTick(() => {
+          this.$refs.audio.src = newSong.url
+          this.$refs.audio.play()
+        })
         if (!this.playing) {
           this.setPlayingState(true)
         }
@@ -252,8 +256,15 @@ export default {
     getLyric () {
       this.currentSong.getLyric().then(lyric => {
         this.currentLyric = new Lyric(lyric, this.handleLyric)
-        if (this.playing) {
-          this.currentLyric.play()
+        this.isPureMusic = !this.currentLyric.lines.length
+        if (this.isPureMusic) {
+          this.pureMusicLyric = this.currentLyric.lrc.replace(timeExp, '').trim()
+          this.playingLyric = this.pureMusicLyric
+        } else {
+          if (this.playing && this.canLyricPlay) {
+            // 这个时候有可能用户已经播放了歌曲，要切到对应位置
+            this.currentLyric.seek(this.currentTime * 1000)
+          }
         }
       }).catch(() => {
         this.currentLyric = null
@@ -367,9 +378,9 @@ export default {
       // 增加一个标识位处理当歌曲加载晚于歌词的情况
       this.canLyricPlay = true
       // 如果歌曲的播放晚于歌词的出现，播放的时候需要同步歌词
-      // if (this.currentLyric && !this.isPureMusic) {
-      //   this.currentLyric.seek(this.currentTime * 1000)
-      // }
+      if (this.currentLyric && !this.isPureMusic) {
+        this.currentLyric.seek(this.currentTime * 1000)
+      }
     },
     error () {
       this.songReady = true
