@@ -7,6 +7,7 @@
       <ul>
         <li class="item"
             v-for="item in topList"
+            @click="selectItem(item)"
             :key="item.id">
           <div class="icon">
             <img v-lazy="item.picUrl"
@@ -38,6 +39,7 @@ import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import { playListMinxi } from 'common/js/mixin'
+import { mapMutations } from 'vuex'
 export default {
   name: 'rank',
   components: {
@@ -54,6 +56,15 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setTopList: 'SET_TOP_LIST'
+    }),
+    selectItem (item) {
+      this.setTopList(item)
+      this.$router.push({
+        path: `/rank/${item.id}`
+      })
+    },
     handlePlayList (playList) {
       const bottom = playList.length > 0 ? '60px' : ''
       this.$refs.rank.style.bottom = bottom

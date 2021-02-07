@@ -32,7 +32,8 @@
             :listenScroll="listenScroll"
             @scroll="scroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"
+        <song-list :rank="rank"
+                   :songs="songs"
                    @select="select"></song-list>
       </div>
       <div v-show="!songs.length"
@@ -70,6 +71,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   mixins: [playListMinxi],
