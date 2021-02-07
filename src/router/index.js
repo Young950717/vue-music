@@ -11,7 +11,13 @@ const routes = [
   {
     path: '/recommend',
     name: 'Recommend',
-    component: Recommend
+    component: Recommend,
+    children: [
+      {
+        path: ':id',
+        component: () => import('components/disc/disc.vue')
+      }
+    ]
   },
   {
     path: '/rank',

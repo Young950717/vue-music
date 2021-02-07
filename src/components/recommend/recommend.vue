@@ -52,6 +52,7 @@
 
 <script>
 import { getRecommend, getDiscList } from 'api/recommend'
+import { mapMutations } from 'vuex'
 import { ERR_OK } from 'api/config'
 import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
@@ -75,6 +76,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    }),
     handlePlayList (playList) {
       const bottom = playList.length > 0 ? '60px' : ''
       this.$refs.recommend.style.bottom = bottom
@@ -90,10 +94,6 @@ export default {
     _getDiscList () {
       getDiscList().then(res => {
         if (res.code === ERR_OK) {
-          // // 没那么多数据，造重复的人为制造一点高度
-          // for (let i = 0; i < 10; i++) {
-          //   this.discList.push(res.data.list[0])
-          // }
           this.discList = res.data.list
         }
       })
@@ -105,8 +105,11 @@ export default {
         this.checkLoaded = true
       }
     },
-    selectItem () {
-
+    selectItem (item) {
+      this.setDisc(item)
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
     }
   }
 }
