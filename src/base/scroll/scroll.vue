@@ -16,14 +16,25 @@ export default {
       type: Boolean,
       default: true
     },
+    // 值
     data: {
       type: Array,
       default: null
     },
+    // 是否需要监听滚动
     listenScroll: {
       type: Boolean,
       default: false
-    }
+    },
+    // 是否需要加载更多
+    pullup: {
+      type: Boolean,
+      default: false
+    },
+    beforeScroll: {
+      type: Boolean,
+      default: false
+    },
   },
   watch: {
     data: {
@@ -50,6 +61,18 @@ export default {
         let vm = this
         this.scroll.on('scroll', position => {
           vm.$emit('scroll', position)
+        })
+      }
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+            this.$emit('scrollEnd')
+          }
+        })
+      }
+      if (this.beforeScroll) {
+        this.scroll.on('beforeScrollStart', () => {
+          this.$emit('beforeScroll')
         })
       }
     },

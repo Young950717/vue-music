@@ -13,3 +13,15 @@ export function shuffle (arr) {
   }
   return _arr
 }
+
+export function debounce (fn, delay) {
+  let timer
+  return function () {
+    const context = this
+    const arg = arguments
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      fn.apply(context, arg)
+    }, delay)
+  }
+}

@@ -33,7 +33,13 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
-    component: () => import('components/search/search.vue')
+    component: () => import('components/search/search.vue'),
+    children: [
+      {
+        path: ':id',
+        component: () => import('components/singer-detail/singer-detail.vue'),
+      }
+    ]
   },
   {
     path: '/singer',

@@ -15,6 +15,7 @@ import { ERR_OK } from 'api/config'
 import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
 export default {
   created () {
+    console.log('singer-detail created');
     this._getDetail()
   },
   data () {
