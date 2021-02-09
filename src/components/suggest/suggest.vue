@@ -129,9 +129,13 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select', item)
     },
     listScroll () {
       this.$emit('listScroll')
+    },
+    refresh () {
+      this.$refs.suggest.refresh()
     },
     _genResult (data) {
       let ret = []

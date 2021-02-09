@@ -207,6 +207,7 @@ export default {
     currentSong: {
       handler (newSong, oldSong) {
         if (!newSong.id || !newSong.url || newSong.id === oldSong.id) return
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
         this.songReady = false
         this.canLyricPlay = false
         if (this.currentLyric) {
