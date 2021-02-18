@@ -8,8 +8,10 @@
            @click.stop>
         <div class="list-header">
           <h1 class="title">
-            <i class="icon"></i>
-            <span class="text"></span>
+            <i class="icon"
+               :class="iconMode"
+               @click="changeMode"></i>
+            <span class="text">{{ modeText }}</span>
             <span class="clear"
                   @touchend="showConfirm">
               <i class="icon-clear"></i>
@@ -60,12 +62,14 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 import Scroll from 'base/scroll/scroll.vue'
 import { playMode } from 'common/js/config'
 import Confirm from 'base/confirm/confirm'
+import { PlayerMixin } from 'common/js/mixin'
 export default {
   name: 'playlist',
+  mixins: [PlayerMixin],
   data () {
     return {
       showFlag: false
@@ -74,6 +78,11 @@ export default {
   components: {
     Scroll,
     Confirm
+  },
+  computed: {
+    modeText () {
+      return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
+    }
   },
   watch: {
     currentSong: {
@@ -85,19 +94,7 @@ export default {
       }
     }
   },
-  computed: {
-    ...mapGetters([
-      'sequenceList',
-      'currentSong',
-      'mode',
-      'playList'
-    ])
-  },
   methods: {
-    ...mapMutations({
-      setCurrentIndex: 'SET_CURRENT_INDEX',
-      setPlayingState: 'SET_PLAYING_STATE'
-    }),
     ...mapActions(['deleteSong', 'deleteSongList']),
     show () {
       this.showFlag = true
