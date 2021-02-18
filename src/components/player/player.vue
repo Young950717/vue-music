@@ -126,11 +126,13 @@
                :class="miniIcon"></i>
           </progressCircle>
         </div>
-        <div class="control">
+        <div class="control"
+             @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio ref="audio"
            :src="currentSong.url"
            @playing="ready"
@@ -145,6 +147,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import progressBar from 'base/progress-bar/progress-bar'
+import Playlist from '../playlist/playlist'
 import progressCircle from 'base/progress-circle/progress-circle'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/utils'
@@ -172,7 +175,8 @@ export default {
   components: {
     progressBar,
     progressCircle,
-    Scroll
+    Scroll,
+    Playlist
   },
   computed: {
     iconMode () {
@@ -480,6 +484,9 @@ export default {
       this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
       this.$refs.middleL.style.opacity = opacity
       this.$refs.middleL.style[transitionDuration] = `${time}ms`
+    },
+    showPlaylist () {
+      this.$refs.playlist.show()
     },
     // 补位
     _pad (num, n = 2) {
