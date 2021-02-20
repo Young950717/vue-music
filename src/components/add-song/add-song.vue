@@ -47,11 +47,16 @@
            v-show="query">
         <suggest :query="query"
                  :showSinger="showSinger"
-                 @select="saveSearch"
+                 @select="selectSuggest"
                  @listScroll="blurInput"></suggest>
       </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放队列</span>
+        </div>
+      </top-tip>
     </div>
-
   </transition>
 </template>
 
@@ -65,6 +70,7 @@ import { mapActions, mapGetters } from 'vuex'
 import SongList from 'base/song-list/song-list.vue'
 import Song from 'common/js/song'
 import SearchList from 'base/search-list/search-list.vue'
+import TopTip from 'base/top-tip/top-tip'
 export default {
   name: 'add-song',
   mixins: [searchMixin],
@@ -85,7 +91,8 @@ export default {
     Switches,
     Scroll,
     SongList,
-    SearchList
+    SearchList,
+    TopTip
   },
   computed: {
     ...mapGetters(['playHistory'])
@@ -105,12 +112,20 @@ export default {
     hide () {
       this.showFlag = false
     },
+    selectSuggest () {
+      this.showTip()
+      this.saveSearch()
+    },
     switchItem (idx) {
       this.currentIndex = idx
     },
     selectSong (song, idx) {
       if (idx === 0) return
+      this.showTip()
       this.insertSong(new Song(song))
+    },
+    showTip () {
+      this.$refs.topTip.show()
     }
   }
 }
