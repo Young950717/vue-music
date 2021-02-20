@@ -52,6 +52,11 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/user',
+    name: 'User',
+    component: () => import('components/user-center/user-center.vue')
+  }
 ]
 
 const router = new VueRouter({

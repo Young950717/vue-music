@@ -5,7 +5,10 @@ import {
   saveSearch,
   deleteSearch,
   clearSearch,
-  savePlay
+  savePlay,
+  saveFavorite,
+  deleteFavorite
+
 } from 'common/js/cache'
 function findIndex (list, song) {
   return list.findIndex(item => item.id === song.id)
@@ -120,4 +123,11 @@ export function deleteSongList ({ commit }) {
 
 export function savePlayHistory ({ commit }, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
+}
+
+export function saveFavoriteList ({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, saveFavorite(song))
+}
+export function deleteFavoriteList ({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
 }
