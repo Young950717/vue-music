@@ -26,7 +26,7 @@ export const playListMinxi = {
     }
   },
 }
-export const PlayerMixin = {
+export const playerMixin = {
   computed: {
     ...mapGetters([
       'sequenceList',
@@ -63,5 +63,35 @@ export const PlayerMixin = {
       let index = list.findIndex(item => item.id === this.currentSong.id)
       this.setCurrentIndex(index)
     },
+  },
+}
+
+export const searchMixin = {
+  data () {
+    return {
+      query: ''
+    }
+  },
+  computed: {
+    ...mapGetters(['searchHistory']),
+  },
+  methods: {
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory',
+    ]),
+    blurInput () {
+      this.$refs.searchBox.blur()
+    },
+    saveSearch () {
+      this.saveSearchHistory(this.query)
+    },
+    onQueryChange (query) {
+      this.query = query
+      this.saveSearchHistory(query)
+    },
+    addQuery (key) {
+      this.$refs.searchBox.setQuery(key)
+    }
   },
 }

@@ -60,10 +60,10 @@ import SearchList from 'base/search-list/search-list'
 import Suggest from '../suggest/suggest'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import Confirm from 'base/confirm/confirm.vue'
 import Scroll from 'base/scroll/scroll.vue'
-import { playListMinxi } from 'common/js/mixin'
+import { playListMinxi, searchMixin } from 'common/js/mixin'
 
 export default {
   name: 'search',
@@ -74,14 +74,13 @@ export default {
     Confirm,
     Scroll
   },
-  mixins: [playListMinxi],
+  mixins: [playListMinxi, searchMixin],
   created () {
     this._getHotKey()
   },
   data () {
     return {
       hotkey: [],
-      query: '',
       text: ''
     }
   },
@@ -97,34 +96,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['searchHistory']),
     shortcut () {
       return this.hotkey.concat(this.searchHistory)
     }
   },
   methods: {
-    ...mapActions(['saveSearchHistory', 'deleteSearchHistory', 'clearSearchHistory']),
+    ...mapActions(['clearSearchHistory']),
     handlePlayList (playList) {
       const bottom = playList.length > 0 ? '60px' : 0
       this.$refs.shortcutWrapper.style.bottom = bottom
       this.$refs.shortcut.refresh()
       this.$refs.searchResult.style.bottom = bottom
       this.$refs.suggest.refresh()
-    },
-    onQueryChange (query) {
-      this.query = query
-      this.saveSearchHistory(query)
-    },
-    addQuery (key) {
-      // console.log(key);
-      this.$refs.searchBox.setQuery(key)
-    },
-    blurInput () {
-      this.$refs.searchBox.blur()
-    },
-    saveSearch () {
-      // console.log(this.query);
-      // this.saveSearchHistory(this.query)
     },
     showConfirm () {
       this.text = '确定要删除全部搜索历史吗？'

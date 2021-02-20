@@ -143,13 +143,13 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import progressBar from 'base/progress-bar/progress-bar'
 import Playlist from '../playlist/playlist'
 import progressCircle from 'base/progress-circle/progress-circle'
-import { PlayerMixin } from 'common/js/mixin'
+import { playerMixin } from 'common/js/mixin'
 import { playMode } from 'common/js/config'
 
 import Scroll from 'base/scroll/scroll'
@@ -158,7 +158,7 @@ const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
 export default {
   name: 'player',
-  mixins: [PlayerMixin],
+  mixins: [playerMixin],
   created () {
     this.touch = {}
   },
@@ -181,7 +181,6 @@ export default {
     Playlist
   },
   computed: {
-
     percent () {
       return this.currentTime / this.currentSong.duration
     },
@@ -247,9 +246,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['savePlayHistory']),
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-
     }),
     getLyric () {
       this.currentSong.getLyric().then(lyric => {
@@ -373,6 +372,7 @@ export default {
     ready () {
       clearTimeout(this.timer)
       this.songReady = true
+      this.savePlayHistory(this.currentSong)
       // 增加一个标识位处理当歌曲加载晚于歌词的情况
       this.canLyricPlay = true
       // 如果歌曲的播放晚于歌词的出现，播放的时候需要同步歌词
