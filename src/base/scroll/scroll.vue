@@ -35,13 +35,17 @@ export default {
       type: Boolean,
       default: false
     },
+    refreshDelay: {
+      type: Number,
+      default: 20
+    }
   },
   watch: {
     data: {
       handler () {
         setTimeout(() => {
           this._initScroll()
-        }, 20)
+        }, this.refreshDelay)
       }
     }
   },

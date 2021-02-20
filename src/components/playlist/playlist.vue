@@ -20,7 +20,8 @@
         </div>
         <scroll class="list-content"
                 ref="listContent"
-                :data="sequenceList">
+                :data="sequenceList"
+                :refreshDelay="refreshDelay">
           <transition-group ref="list"
                             name="list"
                             tag="ul">
@@ -75,7 +76,8 @@ export default {
   mixins: [playerMixin],
   data () {
     return {
-      showFlag: false
+      showFlag: false,
+      refreshDelay: 100
     }
   },
   components: {
